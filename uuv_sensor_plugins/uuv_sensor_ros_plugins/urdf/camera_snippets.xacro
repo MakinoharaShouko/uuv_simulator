@@ -317,7 +317,7 @@
             <stddev>${stddev}</stddev>
           </noise>
         </camera>
-        <plugin name="camera${suffix}_controller" filename="libgazebo_ros_camera.so">
+        <plugin name="camera${suffix}_controller" filename="libgazebo_ros_openni_kinect.so">
           <baseline>0.2</baseline>
           <alwaysOn>true</alwaysOn>
 
@@ -334,7 +334,7 @@
           <backgroundB>0</backgroundB>
 
           <pointCloudCutoff>0.5</pointCloudCutoff>
-          <pointCloudCutoffMax>3.0</pointCloudCutoffMax>
+          <pointCloudCutoffMax>10.0</pointCloudCutoffMax>
           <distortionK1>0</distortionK1>
           <distortionK2>0</distortionK2>
           <distortionK3>0</distortionK3>
@@ -351,7 +351,7 @@
           <pointCloudTopicName>${topic}_cloud</pointCloudTopicName>
           <depthImageTopicName>${topic}_depth</depthImageTopicName>
           <depthImageCameraInfoTopicName>${topic}_depth_info</depthImageCameraInfoTopicName>
-          <pointCloudCutoff>10.0</pointCloudCutoff>
+          <!-- pointCloudCutoff>10.0</pointCloudCutoff -->
         </plugin>
       </sensor>
     </gazebo>
