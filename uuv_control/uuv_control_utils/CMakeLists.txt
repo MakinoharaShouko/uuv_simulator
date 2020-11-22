@@ -14,9 +14,11 @@ catkin_install_python(PROGRAMS scripts/set_timed_current_perturbation.py
                                scripts/trajectory_marker_publisher.py
                                scripts/set_thruster_output_efficiency.py
                                scripts/send_cmd_vel.py
+                               scripts/send_follow_waypoints.py
                                scripts/send_waypoint_file.py
                                scripts/set_gm_current_perturbation.py
                                scripts/set_scalar_parameter.py
+                               scripts/add_waypoint_test.py
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(DIRECTORY launch config

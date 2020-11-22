@@ -21,5 +21,7 @@
     <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find uuv_gazebo)/rviz/controller_demo.rviz"/>
 
     <!-- Send the velocity commands -->
-    <node name="send_cmd_vel" pkg="uuv_control_utils" type="send_cmd_vel.py"/>
+    <node name="send_cmd_vel" pkg="uuv_control_utils" type="send_cmd_vel.py">
+        <param name="uuv_name" value="rexrov"/>
+    </node>
 </launch>

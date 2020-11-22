@@ -5,8 +5,9 @@ import keyboard
 from geometry_msgs.msg import Twist
 
 def send_cmd_vel():
-    pub = rospy.Publisher('rexrov/cmd_vel', Twist, queue_size=10)
     rospy.init_node('cmd_vel_pub')
+    uuv_name = rospy.get_param('~uuv_name')
+    pub = rospy.Publisher('%s/cmd_vel' % uuv_name, Twist, queue_size=10)
     rate = rospy.Rate(10)
     # v.linear.x = 0
     # v.linear.y = 0

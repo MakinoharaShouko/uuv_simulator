@@ -1,0 +1,20 @@
+<launch>
+    <arg name="uuv_name"/>
+    <arg name="follow_name" />
+    <arg name="max_forward_speed" default="0.4" />
+    <arg name="heading_offset" default="0" />
+    <arg name="use_fixed_heading" default="False" />
+    <arg name="radius_of_acceptance" default="1" />
+    <arg name="start_time" default="-1"/>
+    <arg name="interpolator" default="lipb"/>
+ 
+    <node pkg="uuv_control_utils" type="send_follow_waypoints.py" name="send_follow_waypoints">
+        <param name="uuv_name" value="$(arg uuv_name)" />
+        <param name="follow_name" value="$(arg follow_name)" />
+        <param name="max_forward_speed" value="$(arg max_forward_speed)" />
+        <param name="heading_offset" value="$(arg heading_offset)" />
+        <param name="use_fixed_heading" value="$(arg use_fixed_heading)" />
+        <param name="radius_of_acceptance" value="$(arg radius_of_acceptance)" />
+        <param name="start_time" value="$(arg start_time)" />
+    </node>
+</launch>
