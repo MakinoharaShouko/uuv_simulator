@@ -2,6 +2,8 @@
 
 import roslib
 import rospy
+import random
+import functools
 
 from math import *
 
@@ -10,48 +12,44 @@ from uuv_control_msgs.srv import AddWaypoint, InitWaypointSet, GoTo
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String, Time
 
+def pose_delay_callback(data, event):
+    global wp_list
+    wp = Waypoint()
+    wp.max_forward_speed = max_forward_speed
+    wp.heading_offset = heading_offset
+    wp.use_fixed_heading = use_fixed_heading
+    wp.radius_of_acceptance = radius_of_acceptance
+    wp.header.frame_id = 'world'
+    wp.point = data.pose.pose.position
+
+    wp.point.x += x_shift
+    wp.point.y += y_shift
+    wp.point.z += z_shift
+
+    wp_list.append(wp)
+
 def follow_pose_callback(data):
     global wp_list
-    if (len(wp_list) == 0 or (sqrt(pow(data.pose.pose.position.x - wp_list[-1].point.x, 2) +
+    if len(wp_list) >= 1 and (sqrt(pow(data.pose.pose.position.x - wp_list[-1].point.x, 2) +
         pow(data.pose.pose.position.y - wp_list[-1].point.y, 2) +
-        pow(data.pose.pose.position.z - wp_list[-1].point.z, 2)) >= 1)):
+        pow(data.pose.pose.position.z - wp_list[-1].point.z, 2)) >= 5):
 
-        wp = Waypoint()
-        wp.max_forward_speed = max_forward_speed
-        wp.heading_offset = heading_offset
-        wp.use_fixed_heading = use_fixed_heading
-        wp.radius_of_acceptance = radius_of_acceptance
-        wp.header.frame_id = 'world'
-        wp.point = data.pose.pose.position
+        if random.randrange(0, 100) > success_rate:
+            return  # message fails to pass through
 
-        wp_list.append(wp)
-        rospy.loginfo('# waypoints = %d' % len(wp_list))
-
-        # success = init_wp(Time(rospy.Time.from_sec(rospy.Time.now().to_sec())),
-        #               True,
-        #               wp_list,
-        #               max_forward_speed,
-        #               heading_offset,
-        #               String(interpolator))
-
-        #response = add_wp(wp)
-        # response = go_to(wp, max_forward_speed, interpolator)
-        # if not response.success:
-        #     rospy.loginfo('Failed to add a new waypoint')
-        # else:
-        #     wp_list = response.waypoints
-        #     rospy.loginfo('Added a waypoint')
-        #     rospy.loginfo('# waypoints = %d' % len(wp_list))
-        #     rospy.loginfo(str(wp_list))
+        # add a delay for the following position message
+        rospy.Timer(rospy.Duration(10.0),
+                    functools.partial(pose_delay_callback, data),
+                    oneshot = True)
 
 def self_pose_callback(data):
     global wp_list
-    if (len(wp_list) > 1):
+    if len(wp_list) > 1:
         # reached the first waypoint in the waypoint list
         # going to the next waypoint
-        if (sqrt(pow(data.pose.pose.position.x - wp_list[0].point.x, 2) +
+        if sqrt(pow(data.pose.pose.position.x - wp_list[0].point.x, 2) +
             pow(data.pose.pose.position.y - wp_list[0].point.y, 2) +
-            pow(data.pose.pose.position.z - wp_list[0].point.z, 2)) <= 0.1):
+            pow(data.pose.pose.position.z - wp_list[0].point.z, 2)) <= 0.1:
             wp_list.pop(0)
 
             try:
@@ -87,9 +85,20 @@ def self_pose_callback(data):
             #     rospy.loginfo(len(wp_list))
             # else:
             #     rospy.loginfo('Failed to remove an old waypoint')
+    elif len(wp_list) == 0:
+        # have an empty waypoint list
+        # want to first add the initial position of the uuv
+        wp = Waypoint()
+        wp.max_forward_speed = max_forward_speed
+        wp.heading_offset = heading_offset
+        wp.use_fixed_heading = use_fixed_heading
+        wp.radius_of_acceptance = radius_of_acceptance
+        wp.header.frame_id = 'world'
+        wp.point = data.pose.pose.position
+        wp_list.append(wp)
 
 if __name__ == '__main__':
-    rospy.init_node('follow_waypoint_publisher')
+    rospy.init_node('follow_waypoint_publisher', anonymous=True)
     #listener = tf.TransformListener()
     rate = rospy.Rate(0.5)
 
@@ -103,6 +112,11 @@ if __name__ == '__main__':
     heading_offset = rospy.get_param('~heading_offset')
     use_fixed_heading = rospy.get_param('~use_fixed_heading')
     radius_of_acceptance = rospy.get_param('~radius_of_acceptance')
+    success_rate = rospy.get_param('~success_rate')
+
+    x_shift = rospy.get_param('~x_shift')
+    y_shift = rospy.get_param('~y_shift')
+    z_shift = rospy.get_param('~z_shift')
 
     # If no start time is provided: start *now*.
     start_time = rospy.Time.now().to_sec()
@@ -145,17 +159,17 @@ if __name__ == '__main__':
     # except rospy.ServiceException as e:
     #     raise rospy.ROSException('Service call for initialize waypoint set failed, error=%s', str(e))
 
-    wp = Waypoint()
-    wp.max_forward_speed = max_forward_speed
-    wp.heading_offset = heading_offset
-    wp.use_fixed_heading = use_fixed_heading
-    wp.radius_of_acceptance = radius_of_acceptance
-    wp.header.frame_id = 'world'
-    wp.point.x = 30
-    wp.point.y = 0
-    wp.point.z = -20
+    # wp = Waypoint()
+    # wp.max_forward_speed = max_forward_speed
+    # wp.heading_offset = heading_offset
+    # wp.use_fixed_heading = use_fixed_heading
+    # wp.radius_of_acceptance = radius_of_acceptance
+    # wp.header.frame_id = 'world'
+    # wp.point.x = rospy.get_param('~initial_x')
+    # wp.point.y = rospy.get_param('~initial_y')
+    # wp.point.z = rospy.get_param('~initial_z')
 
-    wp_list = [wp]
+    wp_list = []
     success = True
 
     # success = init_wp(Time(rospy.Time.from_sec(start_time)),
