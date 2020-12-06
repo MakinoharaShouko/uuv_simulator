@@ -7,29 +7,15 @@
     <arg name="radius_of_acceptance" default="1" />
     <arg name="start_time" default="-1"/>
     <arg name="interpolator" default="lipb"/>
-    <!-- The initial position of the uuv -->
-    <!-- <arg name="initial_x" />
-    <arg name="initial_y" />
-    <arg name="initial_z" /> -->
-    <!-- The amount by which the following waypoint is shifted -->
-    <arg name="x_shift" default="0" />
-    <arg name="y_shift" default="0" />
-    <arg name="z_shift" default="0" />
     <!-- Percentage value of message coming through -->
     <arg name="success_rate" default="100" />
  
-    <node pkg="uuv_control_utils" type="send_follow_waypoints.py" name="send_follow_waypoints" ns="$(arg uuv_name)">
+    <node pkg="uuv_control_utils" type="send_simplified_follow.py" name="send_simplified_follow" ns="$(arg uuv_name)">
         <param name="max_forward_speed" value="$(arg max_forward_speed)" />
         <param name="heading_offset" value="$(arg heading_offset)" />
         <param name="use_fixed_heading" value="$(arg use_fixed_heading)" />
         <param name="radius_of_acceptance" value="$(arg radius_of_acceptance)" />
         <param name="start_time" value="$(arg start_time)" />
-        <!-- <param name="initial_x" value="$(arg initial_x)" />
-        <param name="initial_y" value="$(arg initial_y)" />
-        <param name="initial_z" value="$(arg initial_z)" /> -->
-        <param name="x_shift" value="$(arg x_shift)" />
-        <param name="y_shift" value="$(arg y_shift)" />
-        <param name="z_shift" value="$(arg z_shift)" />
         <param name="success_rate" value="$(arg success_rate)" />
         <remap from="follow/pose_gt" to="/$(arg follow_name)/pose_gt" />
     </node>

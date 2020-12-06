@@ -53,9 +53,7 @@ def self_pose_callback(data):
             wp_list.pop(0)
 
             try:
-                go_to = rospy.ServiceProxy(
-                    '/%s/go_to' % uuv_name,
-                    GoTo)
+                go_to = rospy.ServiceProxy('go_to', GoTo)
             except rospy.ServiceException as e:
                 raise rospy.ROSException('Service call for go to failed, error=%s', str(e))
             
@@ -106,8 +104,6 @@ if __name__ == '__main__':
         rospy.logerr('ROS master not running!')
         sys.exit(-1)
 
-    uuv_name = rospy.get_param('~uuv_name')
-    follow_name = rospy.get_param('~follow_name')
     max_forward_speed = rospy.get_param('~max_forward_speed')
     heading_offset = rospy.get_param('~heading_offset')
     use_fixed_heading = rospy.get_param('~use_fixed_heading')
@@ -147,7 +143,7 @@ if __name__ == '__main__':
     #     raise rospy.ROSException('Service add_waypoint_not available! Closing node...')
 
     try:
-        rospy.wait_for_service('/%s/go_to' % uuv_name, timeout=30)
+        rospy.wait_for_service('go_to', timeout=30)
     except rospy.ROSException:
         raise rospy.ROSException('Service go_to not available! Closing node...')
 
@@ -184,13 +180,9 @@ if __name__ == '__main__':
         # except rospy.ROSException:
         #     raise rospy.ROSException('Service not available! Closing node...')
 
-        rospy.Subscriber('/%s/pose_gt' % follow_name,
-            Odometry,
-            follow_pose_callback)
+        rospy.Subscriber('follow_name/pose_gt', Odometry, follow_pose_callback)
         
-        rospy.Subscriber('/%s/pose_gt' % uuv_name,
-            Odometry,
-            self_pose_callback)
+        rospy.Subscriber('pose_gt', Odometry, self_pose_callback)
         
         rospy.spin()
 

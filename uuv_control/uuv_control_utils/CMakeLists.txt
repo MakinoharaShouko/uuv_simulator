@@ -19,6 +19,7 @@ catkin_install_python(PROGRAMS scripts/set_timed_current_perturbation.py
                                scripts/set_gm_current_perturbation.py
                                scripts/set_scalar_parameter.py
                                scripts/add_waypoint_test.py
+                               scripts/send_simplified_follow.py
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(DIRECTORY launch config
