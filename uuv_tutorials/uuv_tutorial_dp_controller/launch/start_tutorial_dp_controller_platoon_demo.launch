@@ -62,10 +62,14 @@
     <!--
     You can run this demo as
 
-    >> roslaunch uuv_tutorial_dp_controller start_tutorial_dp_controller_demo.launch
+    >> roslaunch uuv_tutorial_dp_controller start_tutorial_dp_controller_platoon_demo.launch
 
-    and you can then send some waypoints to the vehicle to see it working
+    and you can then let one uuv follow another one
 
-    >> roslaunch uuv_control_utils send_waypoints_file.launch uuv_name:=rexrov
+    >> roslaunch uuv_control_utils send_simplified_follow.launch uuv_name:=rexrov2 follow_name:=rexrov1 success_rate:=80
+
+    or 
+
+    >> roslaunch uuv_control_utils send_follow_waypoints.launch uuv_name:=rexrov2 follow_name:=rexrov1 x_shift:=0 y_shift:=0 z_shift:=0 success_rate:=80
     -->
 </launch>
